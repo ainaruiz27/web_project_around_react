@@ -1,0 +1,43 @@
+.header {
+  margin-top: 50px;
+  margin-bottom: 100px;
+
+
+}
+
+@media screen and (max-width:1279px) {
+  .header {
+    margin-top: 20px;
+    margin-left: 20px;
+
+  }
+}
+
+@media screen and (max-width:767px) {
+  .header {
+    max-width: 320px;
+    max-height: 56px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+
+
+  }
+}
+
+.header__logo {
+  max-width: 880px;
+  max-height: 74px;
+  border-bottom: 1px solid #545454;
+  margin: 0 auto 20px auto;
+  padding-bottom: 30px;
+}
+
+@media screen and (max-width:767px) {
+  .header__logo {
+    max-width: 320px;
+    max-height: 56px;
+    padding-left: 20px;
+
+
+  }
+}

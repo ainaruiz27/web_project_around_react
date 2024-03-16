@@ -1,0 +1,116 @@
+
+.card {
+    margin: 0;
+    width: 282px;
+    max-height: 100%;
+    position: relative;
+    background-color: white;
+    border-radius: 10px;
+    z-index: 1;
+
+}
+
+.card__description {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: black;
+    padding: 25px;
+    border-radius: 10px;
+
+}
+
+.card__image {
+    max-width: 282px;
+    overflow: hidden;
+    width: 100%;
+    height: 282px;
+    margin: 0;
+    object-fit: cover;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+
+
+}
+
+.card__image-container {
+    max-width: 282px;
+    overflow: hidden;
+    width: 100%;
+    height: 282px;
+    margin: 0;
+    object-fit: cover;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    background-color: black;
+}
+
+.card__like {
+    background-image: url('../images/like.svg');
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 20.76px;
+    height: 18.13px;
+    border: none;
+    outline: none;
+    position: absolute;
+    right: 10px;
+    transition: background-color 0.3s;
+    z-index: 2;
+    cursor: pointer;
+}
+.card__like:hover {
+    opacity: 0.6;
+    cursor: pointer;
+}
+.card__like_active {
+background-image: url('../images/likeactive.svg');
+
+}
+
+.button_like-active {
+    background-color: black;
+
+}
+.card__counter{
+    position: relative;
+    top: 18px;
+    left:9px;
+
+}
+.card__text {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 29px;
+    max-width: 200px;
+    margin: 0;
+    padding: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+
+}
+
+.card__trash-icon {
+    position: absolute;
+    z-index: 30;
+    height: 20px;
+    width: 20px;
+    background-image: url('../images/Group.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    right: 23px;
+    top: 23px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    opacity: 1;
+}
+
+.card__trash-icon:hover {
+
+    opacity: 0.7;
+}
