@@ -2,7 +2,6 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Main from './Main';
-import Popup from './Popup';
 import PopupWithForm from './PopupWithForm';
 import { api } from '../utils/Api';
 import ImagePopup from './ImagePopup';
@@ -12,7 +11,7 @@ function App() {
   const [openModalProfile, setOpenModalProfile] = React.useState(false);
   const [openModalAddCard, setopenModalAddCard] = React.useState(false);
   const [openModalAvatar, setopenModalAvatar] = React.useState(false);
-  const [openModalConfirmation, setopenModalConfirmation] = React.useState(false);
+  //const [openModalConfirmation, setopenModalConfirmation] = React.useState(false);
   const [openModalImage, setopenModalImage] = React.useState(false);
   const [cards, setCards] = React.useState([]);
   const [selectedCard, setSelectedCard] = React.useState({});
@@ -63,10 +62,10 @@ function App() {
         <PopupWithForm open={openModalProfile} title="Editar perfil" onClose={() => { setOpenModalProfile(false) }}>
           <>
             <input type="text" id="name" name="name" className="form__input"
-              defaultValue="Jacques Costeau" required minLength="5" maxLength="40" />
+              defaultValue={currentuser.name} required minLength="5" maxLength="40" />
             <span className="name-error error-message"></span>
             <input type="text" id="profession" name="about" className="form__input"
-              defaultValue="Explorer" required minLength="5" maxLength="200" />
+              defaultValue={currentuser.about} required minLength="5" maxLength="200" />
             <span className="profession-error error-message"></span>
 
           </>
@@ -83,7 +82,7 @@ function App() {
           </>
         </PopupWithForm>
 
-        <ImagePopup selectedCard={selectedCard} open={openModalImage} onClose={() => {setopenModalImage(false)}}/>
+        <ImagePopup selectedCard={selectedCard} open={openModalImage} onClose={() => { setopenModalImage(false) }} />
 
         <div id="confirmation-popup" className="popup overlay">
           <div className="form">
