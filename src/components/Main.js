@@ -1,12 +1,19 @@
 import editIcon from '../images/Vector1.png';
 import Card from './Card';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import React from 'react';
 
 export default function Main({ handleAddPlaceClick,
   handleEditProfileClick,
   handleEditAvatarClick,
   handleImageClick,
-  user,
+  handleImageRemove,
+  handleImageAddLike,
+  handleImageRemoveLike,
   cards }) {
+
+  const user = React.useContext(CurrentUserContext);
+
   return (
     <>
       <section className="profile">
@@ -36,6 +43,10 @@ export default function Main({ handleAddPlaceClick,
             return <Card
               key={index}
               handleClick={handleImageClick}
+              handleAddLike={handleImageAddLike}
+              handleRemoveLike={handleImageRemoveLike}
+              handleRemove={handleImageRemove}
+              card={item}
               name={item.name}
               likes={item.likes}
               link={item.link} />

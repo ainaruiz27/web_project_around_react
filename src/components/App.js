@@ -2,16 +2,20 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Main from './Main';
-import PopupWithForm from './PopupWithForm';
 import { api } from '../utils/Api';
 import ImagePopup from './ImagePopup';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import AddPlacePopup from './AddPlacePopup';
+import EditProfilePopup from './EditProfilePopup';
+import EditAvatarPopup from './EditAvatarPopup';
+import Popup from './Popup';
 
 function App() {
 
   const [openModalProfile, setOpenModalProfile] = React.useState(false);
   const [openModalAddCard, setopenModalAddCard] = React.useState(false);
   const [openModalAvatar, setopenModalAvatar] = React.useState(false);
-  //const [openModalConfirmation, setopenModalConfirmation] = React.useState(false);
+  const [openModalConfirmation, setopenModalConfirmation] = React.useState(false);
   const [openModalImage, setopenModalImage] = React.useState(false);
   const [cards, setCards] = React.useState([]);
   const [selectedCard, setSelectedCard] = React.useState({});
@@ -36,6 +40,50 @@ function App() {
     })
   }
 
+  const handleImageRemove = (card) => {
+    setSelectedCard(card);
+    setopenModalConfirmation(true);
+  }
+
+  const handleRemoveCard = () => {
+    api.deleteCard(selectedCard._id).then(() => {
+      setCards(cards.filter(item => item._id !== selectedCard._id));
+      setopenModalConfirmation(false);
+    });
+  }
+
+  const handleImageAddLike = (card) => {
+    return api.addLike(card._id).then(cardResponse => {
+      card.likes = cardResponse.likes;
+      setCards([...cards]);
+    })
+  }
+
+  const handleImageRemoveLike = (card) => {
+    return api.removeLike(card._id).then(cardResponse => {
+      card.likes = cardResponse.likes;
+      setCards([...cards]);
+    })
+  }
+
+  const handleSubmitEditProfile = ({ name, about }) => {
+    return api.updateUser({ about, name }).then(user => {
+      setcurrentuser(user);
+    }).then(() => { setOpenModalProfile(false) })
+  }
+
+  const handleSubmitAddCard = ({ title, link }) => {
+    return api.addCard(link, title).then(card => {
+      setCards([card, ...cards])
+    }).then(() => { setopenModalAddCard(false) })
+  }
+
+  const handleSubmitAvatar = ({ newAvatarLink }) => {
+    return api.updateUser({ avatar: newAvatarLink }).then((user) => {
+      setcurrentuser(user);
+    }).then(() => { setopenModalAvatar(false) })
+  }
+
   React.useEffect(() => {
     api.getCards().then(cards => {
       setCards(cards)
@@ -47,60 +95,41 @@ function App() {
 
   return (
     <>
-      <div className='page'>
-        <Header />
-        <Main
-          handleEditProfileClick={handleEditProfileClick}
-          handleEditAvatarClick={handleEditAvatarClick}
-          handleAddPlaceClick={handleAddPlaceClick}
-          handleImageClick={handleImageClick}
-          cards={cards}
-          user={currentuser}
-        />
-        <Footer />
+      <CurrentUserContext.Provider value={currentuser}>
+        <div className='page'>
+          <Header />
+          <Main
+            handleEditProfileClick={handleEditProfileClick}
+            handleEditAvatarClick={handleEditAvatarClick}
+            handleAddPlaceClick={handleAddPlaceClick}
+            handleImageClick={handleImageClick}
+            handleImageRemoveLike={handleImageRemoveLike}
+            handleImageAddLike={handleImageAddLike}
+            handleImageRemove={handleImageRemove}
+            cards={cards}
+          />
+          <Footer />
 
-        <PopupWithForm open={openModalProfile} title="Editar perfil" onClose={() => { setOpenModalProfile(false) }}>
-          <>
-            <input type="text" id="name" name="name" className="form__input"
-              defaultValue={currentuser.name} required minLength="5" maxLength="40" />
-            <span className="name-error error-message"></span>
-            <input type="text" id="profession" name="about" className="form__input"
-              defaultValue={currentuser.about} required minLength="5" maxLength="200" />
-            <span className="profession-error error-message"></span>
+          <EditProfilePopup
+            handleSubmit={handleSubmitEditProfile}
+            handleClose={() => { setOpenModalProfile(false) }} open={openModalProfile} />
+          <AddPlacePopup
+            handleSubmit={handleSubmitAddCard}
+            handleClose={() => { setopenModalAddCard(false) }} open={openModalAddCard} />
+          <EditAvatarPopup
+            handleSubmit={handleSubmitAvatar}
+            handleClose={() => { setopenModalAvatar(false) }} open={openModalAvatar} />
+          <ImagePopup selectedCard={selectedCard} open={openModalImage} onClose={() => { setopenModalImage(false) }} />
 
-          </>
-        </PopupWithForm>
-
-        <PopupWithForm open={openModalAddCard} title="Nuevo lugar" onClose={() => { setopenModalAddCard(false) }}>
-          <>
-            <input type="text" id="title" name="title" className="form__input "
-              placeholder="Título" required minLength="5" maxLength="40" />
-            <span className="title-error error-message"></span>
-            <input type="url" id="link" name="link" className="form__input "
-              placeholder="Enlace de la imagen" required />
-            <span className="link-error error-message"></span>
-          </>
-        </PopupWithForm>
-
-        <ImagePopup selectedCard={selectedCard} open={openModalImage} onClose={() => { setopenModalImage(false) }} />
-
-        <div id="confirmation-popup" className="popup overlay">
-          <div className="form">
-            <button type="button" className="popup__close-icon"></button>
-            <h2 className="popup__title">¿Estás seguro/a?</h2>
-            <button type="button" className="popup__confirm-button">Sí</button>
-          </div>
+          <Popup open={openModalConfirmation}>
+            <div className="form">
+              <button type="button" className="popup__close-icon" onClick={() => { setopenModalConfirmation(false) }}></button>
+              <h2 className="popup__title">¿Estás seguro/a?</h2>
+              <button type="button" className="popup__confirm-button" onClick={handleRemoveCard}>Sí</button>
+            </div>
+          </Popup>
         </div>
-
-        <PopupWithForm open={openModalAvatar} title="Cambiar foto de perfil" onClose={() => { setopenModalAvatar(false) }}>
-          <>
-            <label htmlFor="new-avatar-link" className="form__label"></label>
-            <input type="url" id="new-avatar-link" name="newAvatarLink" className="form__input"
-              placeholder="Ingrese el nuevo enlace" required />
-            <span className="new-avatar-link-error error-message"></span>
-          </>
-        </PopupWithForm>
-      </div>
+      </CurrentUserContext.Provider>
     </>
   );
 }
