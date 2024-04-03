@@ -86,4 +86,5 @@ class Api {
 
 export const api = new Api('https://around.nomoreparties.co/v1/web_es_11', 'e261a8b3-b4ff-46a8-9ab6-ef7a9f75bcee');
 
-export default new Api();
+
+export default api;
