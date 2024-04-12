@@ -9,6 +9,7 @@ import AddPlacePopup from './AddPlacePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import Popup from './Popup';
+import FormValidator from './FormValidator';
 
 function App() {
 
