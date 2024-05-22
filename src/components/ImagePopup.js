@@ -5,7 +5,7 @@ export default function ImagePopup({ open, onClose, selectedCard }) {
     <>
       <Popup open={open}>
         <div className="popup__image-container">
-          <img className="popup__image"
+          <img className="_image"
             src={selectedCard.link}
             alt={selectedCard.name} />
           <button

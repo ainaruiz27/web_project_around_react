@@ -1,8 +1,10 @@
 import React from 'react';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import Main from './Main';
 import { api } from '../utils/api';
+import { auth } from '../utils/auth';
 import ImagePopup from './ImagePopup';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import AddPlacePopup from './AddPlacePopup';
@@ -10,6 +12,10 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import Popup from './Popup';
 import FormValidator from './FormValidator';
+import Login from './Login';
+import Register from './Register';
+import InfoTooltip from './InfoTooltip';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
 
@@ -21,6 +27,12 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentuser, setcurrentuser] = React.useState({});
+
+  const [openTooltip, setOpenTooltip] = React.useState(false);
+  const [tootltipMessage, setTootltipMessage] = React.useState('');
+  const [tooltipType, setTooltipType] = React.useState('success');
+
+  const history = useHistory();
 
   const handleEditAvatarClick = () => {
     setopenModalAvatar(true)
@@ -86,29 +98,95 @@ function App() {
   }
 
   React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      getUserInfo(token);
+    }
+
+    /*
     api.getCards().then(cards => {
       setCards(cards)
     })
     api.getUserInfo().then(user => {
       setcurrentuser(user);
-    })
+    })*/
   }, [])
+
+  const handleLogin = ({ email, password }) => {
+    return auth.login(email, password).then(({ token, message }) => {
+      if (!!token) {
+        localStorage.setItem('token', token);
+        getUserInfo();
+      } else {
+        setOpenTooltip(true);
+        setTootltipMessage(message);
+        setTooltipType('error');
+      }
+
+    }).catch(error => {
+      console.error(error)
+    });
+  }
+
+  const handleRegister = ({ email, password }) => {
+    return auth.register(email, password).then(({ error }) => {
+      if (!!error) {
+        setTootltipMessage(error);
+        setTooltipType('error');
+      } else {
+        setTootltipMessage('Registrado con éxito, ahora puedes iniciar sesión');
+        setTooltipType('success');
+        history.push('/login');
+      }
+      setOpenTooltip(true);
+    }).catch(error => {
+      console.error(error)
+    });
+  }
+
+  const getUserInfo = (token) => {
+    auth.me(token).then(user => {
+      history.push('/home');
+      api.getCards().then(cards => {
+        setCards(cards)
+      })
+      api.getUserInfo().then(user => {
+        setcurrentuser(user);
+      })
+    })
+  }
+
+  const onLogout = () => {
+    localStorage.clear();
+    setcurrentuser({});
+    history.push('/login')
+  }
 
   return (
     <>
       <CurrentUserContext.Provider value={currentuser}>
         <div className='page'>
-          <Header />
-          <Main
-            handleEditProfileClick={handleEditProfileClick}
-            handleEditAvatarClick={handleEditAvatarClick}
-            handleAddPlaceClick={handleAddPlaceClick}
-            handleImageClick={handleImageClick}
-            handleImageRemoveLike={handleImageRemoveLike}
-            handleImageAddLike={handleImageAddLike}
-            handleImageRemove={handleImageRemove}
-            cards={cards}
-          />
+          <Header onLogout={onLogout} />
+          <Switch>
+            <Route path="/login">
+              <Login handleSubmit={handleLogin} />
+            </Route>
+            <ProtectedRoute path="/home" loggedIn={currentuser && !!currentuser._id}>
+              <Main
+                handleEditProfileClick={handleEditProfileClick}
+                handleEditAvatarClick={handleEditAvatarClick}
+                handleAddPlaceClick={handleAddPlaceClick}
+                handleImageClick={handleImageClick}
+                handleImageRemoveLike={handleImageRemoveLike}
+                handleImageAddLike={handleImageAddLike}
+                handleImageRemove={handleImageRemove}
+                cards={cards}
+              />
+            </ProtectedRoute>
+            <Route path="/register">
+              <Register handleSubmit={handleRegister} />
+            </Route>
+          </Switch>
           <Footer />
 
           <EditProfilePopup
@@ -129,6 +207,10 @@ function App() {
               <button type="button" className="popup__confirm-button" onClick={handleRemoveCard}>Sí</button>
             </div>
           </Popup>
+
+          <InfoTooltip open={openTooltip}
+            onClose={() => { setOpenTooltip(false) }}
+            message={tootltipMessage} type={tooltipType} />
         </div>
       </CurrentUserContext.Provider>
     </>
